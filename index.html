@@ -6,11 +6,16 @@
     <title>TCG AR Viewer</title>
     <meta name="description" content="WebAR app that recognizes Pokémon & Yu-Gi-Oh! TCG cards and displays 3D characters.">
     
-    <!-- THREE r148 = last version with global GLTFLoader script -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.148.0/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.148.0/examples/js/loaders/GLTFLoader.js"></script>
-    <!-- MindAR THREE.js uses window.THREE set above -->
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"></script>
+    <!-- Modern ES Modules Setup for THREE.js and MindAR -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.147.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.147.0/examples/jsm/",
+            "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+        }
+    }
+    </script>
 
     <link rel="stylesheet" href="style.css">
 </head>
@@ -44,7 +49,7 @@
     <!-- AR Container: MindAR injects camera feed + canvas here -->
     <div id="ar-container"></div>
 
-    <!-- External JS -->
-    <script src="main.js"></script>
+    <!-- External JS as ES Module -->
+    <script type="module" src="main.js"></script>
 </body>
 </html>

@@ -1,3 +1,7 @@
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MindARThree } from 'mindar-image-three';
+
 // ============================================
 // DATABASE: Thẻ bài & mô hình 3D tương ứng
 // ============================================
@@ -13,8 +17,6 @@ const cardsDatabase = [
 // ============================================
 // KHỞI ĐỘNG AR (MindAR THREE.js - 1 WebGL context)
 // ============================================
-const { MindARThree } = window.MINDAR.IMAGE;
-
 const mindarThree = new MindARThree({
     container: document.querySelector('#ar-container'),
     imageTargetSrc: 'assets/targets.mind',
@@ -30,8 +32,8 @@ const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
 dirLight.position.set(0.5, 1, 1);
 scene.add(dirLight);
 
-// Loader GLB (THREE.GLTFLoader is set globally by three@0.148.0/examples/js/loaders/GLTFLoader.js)
-const loader = new THREE.GLTFLoader();
+// Loader GLB (using imported ES Module GLTFLoader)
+const loader = new GLTFLoader();
 const mixers = [];
 const clock = new THREE.Clock();
 
