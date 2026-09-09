@@ -30,7 +30,7 @@ const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
 dirLight.position.set(0.5, 1, 1);
 scene.add(dirLight);
 
-// Loader GLB
+// Loader GLB (THREE.GLTFLoader is set globally by three@0.148.0/examples/js/loaders/GLTFLoader.js)
 const loader = new THREE.GLTFLoader();
 const mixers = [];
 const clock = new THREE.Clock();
