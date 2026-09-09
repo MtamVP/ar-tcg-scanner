@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>TCG AR Viewer</title>
     
-    <!-- Dependencies: A-Frame 1.4.2 + MindAR 1.2.5 (tested compatible pair) -->
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <!-- Dependencies: exact versions from MindAR official docs -->
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.2.0/dist/aframe-extras.min.js"></script>
 
     <!-- External CSS -->
     <link rel="stylesheet" href="style.css">
@@ -72,12 +71,12 @@
             <a-gltf-model src="assets/yugioh/animated_blue-_eyes_white_dragon_yugioh.glb" rotation="90 0 0" scale="0.05 0.05 0.05" animation-mixer></a-gltf-model>
         </a-entity>
         <a-entity mindar-image-target="targetIndex: 5" class="tracking-target" data-theme="theme-yugioh">
-            <a-gltf-model src="assets/yugioh/dark-magician.glb" rotation="90 0 0" scale="0.05 0.05 0.05" animation-mixer></a-gltf-model>
+            <a-gltf-model src="assets/yugioh/dark_magician.glb" rotation="90 0 0" scale="0.05 0.05 0.05" animation-mixer></a-gltf-model>
         </a-entity>
 
     </a-scene>
 
     <!-- External JS -->
-    <script src="main.js"></script>
+    <script src="main.js" defer></script>
 </body>
 </html>
