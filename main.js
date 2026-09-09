@@ -8,7 +8,7 @@ import { MindARThree } from 'mindar-image-three';
 const cardsDatabase = [
     { id: 0, url: 'assets/pokemon/charizard.glb',   theme: 'theme-pokemon', scale: 0.085 },
     { id: 1, url: 'assets/pokemon/pikachu.glb',     theme: 'theme-pokemon', scale: 0.05 },
-    { id: 2, url: 'assets/pokemon/rayquaza.glb',    theme: 'theme-pokemon', scale: 0.09 },
+    { id: 2, url: 'assets/pokemon/rayquaza.glb',    theme: 'theme-pokemon', scale: 0.1237 },
     { id: 3, url: 'assets/pokemon/mew.glb',         theme: 'theme-pokemon', scale: 0.327 },
     { id: 4, url: 'assets/yugioh/animated_blue-_eyes_white_dragon_yugioh.glb', theme: 'theme-yugioh', scale: 0.5 },
     { id: 5, url: 'assets/yugioh/dark_magician.glb', theme: 'theme-yugioh', scale: 0.06 }
