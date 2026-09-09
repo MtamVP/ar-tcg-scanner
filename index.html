@@ -8,6 +8,15 @@
     <!-- Dependencies: exact versions from MindAR official docs -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <script>
+      // Pre-warm WebGL context so TF.js backend can initialize without errors
+      (function() {
+        try {
+          var c = document.createElement('canvas');
+          c.getContext('webgl2') || c.getContext('webgl');
+        } catch(e) {}
+      })();
+    </script>
 
     <!-- External CSS -->
     <link rel="stylesheet" href="style.css">
@@ -43,8 +52,7 @@
     <a-scene 
         id="ar-scene"
         mindar-image="imageTargetSrc: assets/targets.mind; filterMinCF:0.0001; filterBeta: 0.001;" 
-        color-space="sRGB" 
-        renderer="colorManagement: true, physicallyCorrectLights" 
+        renderer="antialias: false;"
         vr-mode-ui="enabled: false" 
         device-orientation-permission-ui="enabled: false">
         
