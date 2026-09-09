@@ -1,0 +1,226 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+:root {
+    /* Base variables that will be overridden by themes */
+    --primary-color: #ffcb05;
+    --secondary-color: #2a75bb;
+    --reticle-bg: rgba(0, 0, 0, 0.1);
+    --tab-bg-active: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+    --tab-shadow: rgba(255, 0, 0, 0.4);
+}
+
+/* Pokemon Theme (Red, Blue, Yellow) */
+body.theme-pokemon {
+    --primary-color: #ffcb05; /* Pokemon Yellow */
+    --secondary-color: #ff0000; /* Pokeball Red */
+    --reticle-bg: rgba(255, 0, 0, 0.05);
+    --tab-bg-active: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+    --tab-shadow: rgba(255, 0, 0, 0.4);
+}
+
+/* Yu-Gi-Oh Theme (Gold, Dark Purple, Mystical) */
+body.theme-yugioh {
+    --primary-color: #cf9b27; /* Millennium Puzzle Gold */
+    --secondary-color: #cf9b27;
+    --reticle-bg: rgba(63, 30, 92, 0.2); /* Dark magical purple */
+    --tab-bg-active: linear-gradient(135deg, #cf9b27 0%, #8a6311 100%);
+    --tab-shadow: rgba(207, 155, 39, 0.4);
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    background-color: #000;
+}
+
+/* Navbar UI */
+.ui-navbar {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    background: rgba(25, 25, 30, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 10px 20px;
+    border-radius: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    transition: all 0.5s ease;
+}
+
+.nav-tab {
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    padding: 10px 25px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.nav-tab.active {
+    background: var(--tab-bg-active);
+    color: #fff;
+    box-shadow: 0 4px 15px var(--tab-shadow);
+}
+
+.nav-tab:hover:not(.active) {
+    color: rgba(255, 255, 255, 1);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Scanning Overlay */
+.scanning-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 900;
+    pointer-events: none;
+}
+
+.scanning-reticle {
+    width: 250px;
+    height: 350px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    position: relative;
+    margin-bottom: 30px;
+    background: var(--reticle-bg);
+    transition: background 0.5s ease;
+}
+
+/* Reticle Corners using variables */
+.scanning-reticle::before,
+.scanning-reticle::after,
+.scanning-reticle-inner-1,
+.scanning-reticle-inner-2 {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-color: var(--primary-color);
+    border-style: solid;
+    transition: border-color 0.5s ease;
+}
+
+.scanning-reticle::before {
+    top: -2px; left: -2px;
+    border-width: 3px 0 0 3px;
+    border-top-left-radius: 15px;
+}
+
+.scanning-reticle::after {
+    bottom: -2px; right: -2px;
+    border-width: 0 3px 3px 0;
+    border-bottom-right-radius: 15px;
+}
+
+.scanning-reticle-inner-1 {
+    top: -2px; right: -2px;
+    border-width: 3px 3px 0 0;
+    border-top-right-radius: 15px;
+}
+
+.scanning-reticle-inner-2 {
+    bottom: -2px; left: -2px;
+    border-width: 0 0 3px 3px;
+    border-bottom-left-radius: 15px;
+}
+
+/* Camera Switch Button */
+.camera-switch-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+    background: rgba(25, 25, 30, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.camera-switch-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.camera-switch-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Animated Laser Line */
+.scanning-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--primary-color);
+    box-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color);
+    animation: scan 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    transition: all 0.5s ease;
+}
+
+@keyframes scan {
+    0% { top: 10px; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: calc(100% - 10px); opacity: 0; }
+}
+
+/* Pulsing Text */
+.scanning-text {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-align: center;
+    animation: pulse 1.5s ease-in-out infinite;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 12px 24px;
+    border-radius: 30px;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: color 0.5s ease;
+}
+
+body.theme-pokemon .scanning-text {
+    color: #ffcb05;
+}
+
+body.theme-yugioh .scanning-text {
+    color: #cf9b27;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}
