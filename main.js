@@ -1,79 +1,133 @@
-// ==========================================
-// LOGIC GIAO DIỆN & TƯƠNG TÁC
-// ==========================================
-document.addEventListener("DOMContentLoaded", function() {
-    const scanningOverlay = document.getElementById('scanning-overlay');
-    const scanningText = document.getElementById('scanning-text');
-    const targets = document.querySelectorAll('.tracking-target');
-    const tabs = document.querySelectorAll('.nav-tab');
-    
-    let activeTargets = 0;
+// ============================================
+// DATABASE: Thẻ bài & mô hình 3D tương ứng
+// ============================================
+const cardsDatabase = [
+    { id: 0, url: 'assets/pokemon/charizard.glb',   theme: 'theme-pokemon', scale: 0.05 },
+    { id: 1, url: 'assets/pokemon/pikachu.glb',     theme: 'theme-pokemon', scale: 0.05 },
+    { id: 2, url: 'assets/pokemon/rayquaza.glb',    theme: 'theme-pokemon', scale: 0.05 },
+    { id: 3, url: 'assets/pokemon/mew.glb',         theme: 'theme-pokemon', scale: 0.05 },
+    { id: 4, url: 'assets/yugioh/animated_blue-_eyes_white_dragon_yugioh.glb', theme: 'theme-yugioh', scale: 0.05 },
+    { id: 5, url: 'assets/yugioh/dark_magician.glb', theme: 'theme-yugioh', scale: 0.05 }
+];
 
-    // Handle UI Tab Switching manually
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            
-            const theme = tab.getAttribute('data-theme');
-            document.body.className = theme;
-            
-            if (theme === 'theme-pokemon') {
-                scanningText.textContent = "Scanning for Pokémon TCG cards...";
-            } else if (theme === 'theme-yugioh') {
-                scanningText.textContent = "Scanning for Yu-Gi-Oh! TCG cards...";
-            }
-        });
-    });
+// ============================================
+// KHỞI ĐỘNG AR (MindAR THREE.js - 1 WebGL context)
+// ============================================
+const { MindARThree } = window.MINDAR.IMAGE;
 
-    // Handle AR Tracking Events (Tự động đổi theme khi quét đúng thẻ)
-    targets.forEach(target => {
-        target.addEventListener("targetFound", () => {
-            activeTargets++;
-            scanningOverlay.style.display = 'none';
-            
-            // Tự động nhấn vào tab Pokemon hoặc Yugioh tương ứng
-            const theme = target.getAttribute('data-theme');
-            document.querySelector(`[data-theme="${theme}"]`).click();
-        });
-        
-        target.addEventListener("targetLost", () => {
-            activeTargets--;
-            if (activeTargets <= 0) {
-                activeTargets = 0;
-                scanningOverlay.style.display = 'flex';
-            }
-        });
-    });
+const mindarThree = new MindARThree({
+    container: document.querySelector('#ar-container'),
+    imageTargetSrc: 'assets/targets.mind',
+    filterMinCF: 0.0001,
+    filterBeta: 0.001,
+});
 
-    // Camera Switch Logic - Chờ AR sẵn sàng mới cho bấm
-    const cameraSwitchBtn = document.getElementById('camera-switch-btn');
-    let currentFacingMode = 'environment'; // Mặc định: cam sau (cho điện thoại)
-    let arSystemReady = false;
+const { renderer, scene, camera } = mindarThree;
 
-    const sceneEl = document.querySelector('a-scene');
+// Ánh sáng
+scene.add(new THREE.AmbientLight(0xffffff, 1.2));
+const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+dirLight.position.set(0.5, 1, 1);
+scene.add(dirLight);
 
-    // Lắng nghe sự kiện AR khởi động xong mới kích hoạt nút
-    sceneEl.addEventListener('arReady', () => {
-        arSystemReady = true;
-        cameraSwitchBtn.style.opacity = '1';
-    });
+// Loader GLB
+const loader = new THREE.GLTFLoader();
+const mixers = [];
+const clock = new THREE.Clock();
 
-    cameraSwitchBtn.style.opacity = '0.4'; // Mờ khi chưa sẵn sàng
+// Load model cho từng thẻ bài
+const scanningOverlay = document.getElementById('scanning-overlay');
+const scanningText = document.getElementById('scanning-text');
 
-    cameraSwitchBtn.addEventListener('click', () => {
-        if (!arSystemReady) return; // Bỏ qua nếu AR chưa xong
+cardsDatabase.forEach(card => {
+    const anchor = mindarThree.addAnchor(card.id);
 
-        const arSystem = sceneEl.systems['mindar-image-system'];
-        if (!arSystem) return;
+    loader.load(card.url, (gltf) => {
+        const model = gltf.scene;
+        model.scale.setScalar(card.scale);
+        model.rotation.x = Math.PI / 2; // Đứng thẳng lên
+        anchor.group.add(model);
 
-        try {
-            arSystem.stop();
-            currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
-            sceneEl.setAttribute('mindar-image', `imageTargetSrc: assets/targets.mind; filterMinCF:0.0001; filterBeta: 0.001; facingMode: ${currentFacingMode};`);
-            setTimeout(() => arSystem.start(), 300);
-        } catch (err) {
-            console.error("Camera switch error:", err);
+        // Animation
+        if (gltf.animations && gltf.animations.length > 0) {
+            const mixer = new THREE.AnimationMixer(model);
+            gltf.animations.forEach(clip => mixer.clipAction(clip).play());
+            mixers.push(mixer);
         }
+    }, undefined, (err) => {
+        console.warn('Model load error:', card.url, err);
+    });
+
+    // Tự động đổi theme UI khi quét đúng thẻ
+    anchor.onTargetFound = () => {
+        scanningOverlay.style.display = 'none';
+        const btn = document.querySelector(`.nav-tab[data-theme="${card.theme}"]`);
+        if (btn) btn.click();
+    };
+
+    anchor.onTargetLost = () => {
+        scanningOverlay.style.display = 'flex';
+    };
+});
+
+// ============================================
+// GIAO DIỆN: Tab switching
+// ============================================
+document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const theme = tab.getAttribute('data-theme');
+        document.body.className = theme;
+        scanningText.textContent = theme === 'theme-pokemon'
+            ? 'Scanning for Pokémon TCG cards...'
+            : 'Scanning for Yu-Gi-Oh! TCG cards...';
     });
 });
+
+// ============================================
+// KHỞI ĐỘNG & CAMERA SWITCH
+// ============================================
+const cameraSwitchBtn = document.getElementById('camera-switch-btn');
+let facingMode = 'environment';
+
+const startAR = async () => {
+    try {
+        await mindarThree.start();
+        cameraSwitchBtn.style.opacity = '1';
+
+        // Vòng lặp render
+        renderer.setAnimationLoop(() => {
+            const delta = clock.getDelta();
+            mixers.forEach(m => m.update(delta));
+            renderer.render(scene, camera);
+        });
+    } catch (err) {
+        console.error('AR start failed:', err);
+        scanningText.textContent = '❌ Không thể mở Camera. Hãy cấp quyền và thử lại!';
+    }
+};
+
+cameraSwitchBtn.addEventListener('click', async () => {
+    if (cameraSwitchBtn.style.opacity === '0.4') return;
+    try {
+        renderer.setAnimationLoop(null);
+        await mindarThree.stop();
+        facingMode = facingMode === 'environment' ? 'user' : 'environment';
+        
+        // Tạo lại MindAR với camera mới
+        const newMindar = new MindARThree({
+            container: document.querySelector('#ar-container'),
+            imageTargetSrc: 'assets/targets.mind',
+            filterMinCF: 0.0001,
+            filterBeta: 0.001,
+            facingMode: facingMode,
+        });
+        Object.assign(mindarThree, newMindar);
+        await startAR();
+    } catch (err) {
+        console.error('Camera switch error:', err);
+    }
+});
+
+startAR();

@@ -4,21 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>TCG AR Viewer</title>
+    <meta name="description" content="WebAR app that recognizes Pokémon & Yu-Gi-Oh! TCG cards and displays 3D characters.">
     
-    <!-- Dependencies: exact versions from MindAR official docs -->
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-    <script>
-      // Pre-warm WebGL context so TF.js backend can initialize without errors
-      (function() {
-        try {
-          var c = document.createElement('canvas');
-          c.getContext('webgl2') || c.getContext('webgl');
-        } catch(e) {}
-      })();
-    </script>
+    <!-- MindAR THREE.js (1 WebGL context shared between tracking + rendering) -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.150.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"></script>
 
-    <!-- External CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="theme-pokemon">
@@ -34,7 +26,7 @@
     </div>
 
     <!-- Camera Switch Button -->
-    <div class="camera-switch-btn" id="camera-switch-btn">
+    <div class="camera-switch-btn" id="camera-switch-btn" style="opacity:0.4;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
             <path d="M12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"></path>
@@ -48,43 +40,10 @@
         <div class="nav-tab" data-theme="theme-yugioh">Yu-Gi-Oh! Scanner</div>
     </div>
 
-    <!-- AR Scene -->
-    <a-scene 
-        id="ar-scene"
-        mindar-image="imageTargetSrc: assets/targets.mind; filterMinCF:0.0001; filterBeta: 0.001;" 
-        renderer="antialias: false;"
-        vr-mode-ui="enabled: false" 
-        device-orientation-permission-ui="enabled: false">
-        
-        <a-light type="ambient" color="#ffffff" intensity="1.2"></a-light>
-        <a-light type="directional" position="0.5 1 1" intensity="1.5"></a-light>
-        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-
-        <!-- Pokemon: models load on-demand, no preloading to avoid timeout -->
-        <a-entity mindar-image-target="targetIndex: 0" class="tracking-target" data-theme="theme-pokemon">
-            <a-gltf-model src="assets/pokemon/charizard.glb" rotation="90 0 0" scale="0.05 0.05 0.05" animation-mixer></a-gltf-model>
-        </a-entity>
-        <a-entity mindar-image-target="targetIndex: 1" class="tracking-target" data-theme="theme-pokemon">
-            <a-gltf-model src="assets/pokemon/pikachu.glb" rotation="90 0 0" scale="0.05 0.05 0.05" animation-mixer></a-gltf-model>
-        </a-entity>
-        <a-entity mindar-image-target="targetIndex: 2" class="tracking-target" data-theme="theme-pokemon">
-            <a-gltf-model src="assets/pokemon/rayquaza.glb" rotation="90 0 0" scale="0.05 0.05 0.05" animation-mixer></a-gltf-model>
-        </a-entity>
-        <a-entity mindar-image-target="targetIndex: 3" class="tracking-target" data-theme="theme-pokemon">
-            <a-gltf-model src="assets/pokemon/mew.glb" rotation="90 0 0" scale="0.05 0.05 0.05" animation-mixer></a-gltf-model>
-        </a-entity>
-
-        <!-- Yu-Gi-Oh -->
-        <a-entity mindar-image-target="targetIndex: 4" class="tracking-target" data-theme="theme-yugioh">
-            <a-gltf-model src="assets/yugioh/animated_blue-_eyes_white_dragon_yugioh.glb" rotation="90 0 0" scale="0.05 0.05 0.05" animation-mixer></a-gltf-model>
-        </a-entity>
-        <a-entity mindar-image-target="targetIndex: 5" class="tracking-target" data-theme="theme-yugioh">
-            <a-gltf-model src="assets/yugioh/dark_magician.glb" rotation="90 0 0" scale="0.05 0.05 0.05" animation-mixer></a-gltf-model>
-        </a-entity>
-
-    </a-scene>
+    <!-- AR Container: MindAR injects camera feed + canvas here -->
+    <div id="ar-container"></div>
 
     <!-- External JS -->
-    <script src="main.js" defer></script>
+    <script src="main.js"></script>
 </body>
 </html>
