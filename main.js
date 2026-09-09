@@ -46,29 +46,34 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    // Camera Switch Logic (Vá lỗi đổi Camera)
+    // Camera Switch Logic - Chờ AR sẵn sàng mới cho bấm
     const cameraSwitchBtn = document.getElementById('camera-switch-btn');
-    let currentCamera = 'user'; // Mặc định là cam trước
-    
+    let currentFacingMode = 'environment'; // Mặc định: cam sau (cho điện thoại)
+    let arSystemReady = false;
+
+    const sceneEl = document.querySelector('a-scene');
+
+    // Lắng nghe sự kiện AR khởi động xong mới kích hoạt nút
+    sceneEl.addEventListener('arReady', () => {
+        arSystemReady = true;
+        cameraSwitchBtn.style.opacity = '1';
+    });
+
+    cameraSwitchBtn.style.opacity = '0.4'; // Mờ khi chưa sẵn sàng
+
     cameraSwitchBtn.addEventListener('click', () => {
-        const sceneEl = document.querySelector('a-scene');
-        if (sceneEl.systems && sceneEl.systems['mindar-image-system']) {
-            const arSystem = sceneEl.systems['mindar-image-system'];
-            try {
-                // Tạm dừng hệ thống AR
-                arSystem.stop();
-                
-                // Đổi biến camera
-                currentCamera = currentCamera === 'user' ? 'environment' : 'user';
-                
-                // Cập nhật lại thuộc tính cho A-Frame
-                sceneEl.setAttribute('mindar-image', `imageTargetSrc: assets/targets.mind; filterMinCF:0.0001; filterBeta: 0.001; facingMode: ${currentCamera};`);
-                
-                // Khởi động lại hệ thống AR với camera mới
-                arSystem.start();
-            } catch (err) {
-                console.error("Camera switch error:", err);
-            }
+        if (!arSystemReady) return; // Bỏ qua nếu AR chưa xong
+
+        const arSystem = sceneEl.systems['mindar-image-system'];
+        if (!arSystem) return;
+
+        try {
+            arSystem.stop();
+            currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+            sceneEl.setAttribute('mindar-image', `imageTargetSrc: assets/targets.mind; filterMinCF:0.0001; filterBeta: 0.001; facingMode: ${currentFacingMode};`);
+            setTimeout(() => arSystem.start(), 300);
+        } catch (err) {
+            console.error("Camera switch error:", err);
         }
     });
 });
