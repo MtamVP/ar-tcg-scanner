@@ -13,25 +13,19 @@ const cardsDatabase = [
 // ==========================================
 // 2. TỰ ĐỘNG BƠM (INJECT) THẺ BÀI VÀO HTML
 // ==========================================
+// Để tránh lỗi ngầm của A-Frame khi bơm code, ta gán trực tiếp link 3D vào mô hình
 const sceneEl = document.querySelector('a-scene');
-const assetsEl = document.getElementById('dynamic-assets');
 
 cardsDatabase.forEach(card => {
-    // A. Bơm file 3D vào phần tải trước (assets)
-    const assetItem = document.createElement('a-asset-item');
-    assetItem.setAttribute('id', `model-${card.id}`);
-    assetItem.setAttribute('src', card.url);
-    assetsEl.appendChild(assetItem);
-
-    // B. Bơm thẻ AR Target để nhận diện hình ảnh
+    // Bơm thẻ AR Target để nhận diện hình ảnh
     const targetEl = document.createElement('a-entity');
     targetEl.setAttribute('mindar-image-target', `targetIndex: ${card.id}`);
     targetEl.classList.add('tracking-target');
     targetEl.setAttribute('data-theme', card.theme); // Lưu lại theme để đổi giao diện
 
-    // C. Bơm mô hình 3D đứng lên trên tấm thẻ
+    // Bơm mô hình 3D đứng lên trên tấm thẻ (Dùng thẳng URL để tránh lỗi Assets)
     const modelEl = document.createElement('a-gltf-model');
-    modelEl.setAttribute('src', `#model-${card.id}`);
+    modelEl.setAttribute('src', card.url);
     modelEl.setAttribute('rotation', '90 0 0');
     modelEl.setAttribute('position', '0 0 0');
     modelEl.setAttribute('scale', card.scale);
