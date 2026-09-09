@@ -42,19 +42,47 @@
 
     <!-- AR Scene -->
     <a-scene 
+        id="ar-scene"
         mindar-image="imageTargetSrc: assets/targets.mind; filterMinCF:0.0001; filterBeta: 0.001; facingMode: user;" 
         color-space="sRGB" 
         renderer="colorManagement: true, physicallyCorrectLights" 
         vr-mode-ui="enabled: false" 
         device-orientation-permission-ui="enabled: false">
         
-        <a-assets id="dynamic-assets"></a-assets>
+        <a-assets>
+            <a-asset-item id="charizard" src="assets/pokemon/charizard.glb"></a-asset-item>
+            <a-asset-item id="pikachu" src="assets/pokemon/pikachu.glb"></a-asset-item>
+            <a-asset-item id="rayquaza" src="assets/pokemon/rayquaza.glb"></a-asset-item>
+            <a-asset-item id="mew" src="assets/pokemon/mew.glb"></a-asset-item>
+            <a-asset-item id="blueeyes" src="assets/yugioh/animated_blue-_eyes_white_dragon_yugioh.glb"></a-asset-item>
+            <a-asset-item id="darkmagician" src="assets/yugioh/dark-magician.glb"></a-asset-item>
+        </a-assets>
 
         <a-light type="ambient" color="#ffffff" intensity="1.2"></a-light>
         <a-light type="directional" position="0.5 1 1" intensity="1.5"></a-light>
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-        <!-- Targets will be injected here by main.js -->
+        <!-- Pokemon -->
+        <a-entity mindar-image-target="targetIndex: 0" class="tracking-target" data-theme="theme-pokemon">
+            <a-gltf-model src="#charizard" rotation="90 0 0" scale="0.05 0.05 0.05" animation-mixer></a-gltf-model>
+        </a-entity>
+        <a-entity mindar-image-target="targetIndex: 1" class="tracking-target" data-theme="theme-pokemon">
+            <a-gltf-model src="#pikachu" rotation="90 0 0" scale="0.05 0.05 0.05" animation-mixer></a-gltf-model>
+        </a-entity>
+        <a-entity mindar-image-target="targetIndex: 2" class="tracking-target" data-theme="theme-pokemon">
+            <a-gltf-model src="#rayquaza" rotation="90 0 0" scale="0.05 0.05 0.05" animation-mixer></a-gltf-model>
+        </a-entity>
+        <a-entity mindar-image-target="targetIndex: 3" class="tracking-target" data-theme="theme-pokemon">
+            <a-gltf-model src="#mew" rotation="90 0 0" scale="0.05 0.05 0.05" animation-mixer></a-gltf-model>
+        </a-entity>
+
+        <!-- Yu-Gi-Oh -->
+        <a-entity mindar-image-target="targetIndex: 4" class="tracking-target" data-theme="theme-yugioh">
+            <a-gltf-model src="#blueeyes" rotation="90 0 0" scale="0.05 0.05 0.05" animation-mixer></a-gltf-model>
+        </a-entity>
+        <a-entity mindar-image-target="targetIndex: 5" class="tracking-target" data-theme="theme-yugioh">
+            <a-gltf-model src="#darkmagician" rotation="90 0 0" scale="0.05 0.05 0.05" animation-mixer></a-gltf-model>
+        </a-entity>
 
     </a-scene>
 

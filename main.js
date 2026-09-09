@@ -1,42 +1,5 @@
 // ==========================================
-// 1. DATABASE: SỔ DANH BẠ QUẢN LÝ THẺ BÀI
-// ==========================================
-const cardsDatabase = [
-    { id: 0, name: "Charizard",   url: "assets/pokemon/charizard.glb", theme: "theme-pokemon", scale: "0.05 0.05 0.05" },
-    { id: 1, name: "Pikachu",     url: "assets/pokemon/pikachu.glb",   theme: "theme-pokemon", scale: "0.05 0.05 0.05" },
-    { id: 2, name: "Rayquaza",    url: "assets/pokemon/rayquaza.glb",  theme: "theme-pokemon", scale: "0.05 0.05 0.05" },
-    { id: 3, name: "Mew",         url: "assets/pokemon/mew.glb",       theme: "theme-pokemon", scale: "0.05 0.05 0.05" },
-    { id: 4, name: "Blue Eyes",   url: "assets/yugioh/animated_blue-_eyes_white_dragon_yugioh.glb", theme: "theme-yugioh", scale: "0.05 0.05 0.05" },
-    { id: 5, name: "Dark Magician", url: "assets/yugioh/dark-magician.glb", theme: "theme-yugioh", scale: "0.05 0.05 0.05" }
-];
-
-// ==========================================
-// 2. TỰ ĐỘNG BƠM (INJECT) THẺ BÀI VÀO HTML
-// ==========================================
-// Để tránh lỗi ngầm của A-Frame khi bơm code, ta gán trực tiếp link 3D vào mô hình
-const sceneEl = document.querySelector('a-scene');
-
-cardsDatabase.forEach(card => {
-    // Bơm thẻ AR Target để nhận diện hình ảnh
-    const targetEl = document.createElement('a-entity');
-    targetEl.setAttribute('mindar-image-target', `targetIndex: ${card.id}`);
-    targetEl.classList.add('tracking-target');
-    targetEl.setAttribute('data-theme', card.theme); // Lưu lại theme để đổi giao diện
-
-    // Bơm mô hình 3D đứng lên trên tấm thẻ (Dùng thẳng URL để tránh lỗi Assets)
-    const modelEl = document.createElement('a-gltf-model');
-    modelEl.setAttribute('src', card.url);
-    modelEl.setAttribute('rotation', '90 0 0');
-    modelEl.setAttribute('position', '0 0 0');
-    modelEl.setAttribute('scale', card.scale);
-    modelEl.setAttribute('animation-mixer', '');
-    
-    targetEl.appendChild(modelEl);
-    sceneEl.appendChild(targetEl);
-});
-
-// ==========================================
-// 3. LOGIC GIAO DIỆN & TƯƠNG TÁC
+// LOGIC GIAO DIỆN & TƯƠNG TÁC
 // ==========================================
 document.addEventListener("DOMContentLoaded", function() {
     const scanningOverlay = document.getElementById('scanning-overlay');
@@ -83,13 +46,26 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    // Camera Switch Logic
+    // Camera Switch Logic (Vá lỗi đổi Camera)
     const cameraSwitchBtn = document.getElementById('camera-switch-btn');
+    let currentCamera = 'user'; // Mặc định là cam trước
+    
     cameraSwitchBtn.addEventListener('click', () => {
+        const sceneEl = document.querySelector('a-scene');
         if (sceneEl.systems && sceneEl.systems['mindar-image-system']) {
             const arSystem = sceneEl.systems['mindar-image-system'];
             try {
-                arSystem.switchCamera();
+                // Tạm dừng hệ thống AR
+                arSystem.stop();
+                
+                // Đổi biến camera
+                currentCamera = currentCamera === 'user' ? 'environment' : 'user';
+                
+                // Cập nhật lại thuộc tính cho A-Frame
+                sceneEl.setAttribute('mindar-image', `imageTargetSrc: assets/targets.mind; filterMinCF:0.0001; filterBeta: 0.001; facingMode: ${currentCamera};`);
+                
+                // Khởi động lại hệ thống AR với camera mới
+                arSystem.start();
             } catch (err) {
                 console.error("Camera switch error:", err);
             }
