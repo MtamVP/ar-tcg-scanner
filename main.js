@@ -1,3 +1,12 @@
+// Kiểm tra file .mind có load được không trước khi khởi động AR
+fetch('assets/targets.mind', { method: 'HEAD' })
+    .then(res => {
+        if (!res.ok) {
+            alert(`❌ Lỗi: Không tìm thấy file targets.mind (HTTP ${res.status}). Vui lòng kiểm tra lại thư mục assets!`);
+        }
+    })
+    .catch(() => alert('❌ Lỗi mạng: Không thể truy cập file targets.mind!'));
+
 // ==========================================
 // LOGIC GIAO DIỆN & TƯƠNG TÁC
 // ==========================================
